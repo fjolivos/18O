@@ -32,11 +32,16 @@
 
 Como ya me adelantaron, los principales resultados son que el orgullo hacia le país baja, igual que sobre el desarrollo económico. Sin embargo, el orgullo sobre algunas características de los chilenos sube (lástima que en la P2 no hay efecto). 
 
-> CA: Creo que es interesante el que no haya efecto en esa variable. Me da la impresión de que tiene algo identitario más fuerte que 
+> CA: Creo que es interesante el que no haya efecto en esa variable. Me da la impresión de que tiene algo identitario más fuerte que
+
+> FCO: Fuerte que? Voy entonces a agregar esa variable también en el análisis. Estoy de acuerdo que podemos sugerir algo así. Voy a investigar un poco para ver cuál es la distinción teórica que podríamos hacer con las dos. Aunque para la contraparte bastará decir que no hay afeto y en las otras sí.
 
 Creo que eso es un buen resultado y se lo podemos plantear a la contraparte como desafíos para el país, pero oportunidades para revalorizar y resignificar lo que significa ser chileno. Me imagino un gráfico con cada variable compuesto por tres estimaciones dentro del mismo gráfico (binaria, + cov, + ebalance). Prepararé eso para agregarlo antes de enviarlo a la contraparte.
 
-> CA: Crees que parte del análisis pueda indicar que ya se han resignificado conceptos tradicionales de ser chileno. Pienso en que antes _esforzado_ era reconstruir después de un terremoto (ambito global) o ducharse con agua helada luego de trabajar en la construcción (ámbito personal). Ahora ese concepto se amplia y moderniza.
+> CA: Crees que parte del análisis pueda indicar que ya se han resignificado conceptos tradicionales de ser chileno. Pienso en que antes _esforzado_ era reconstruir después de un terremoto (ambito global) o ducharse con agua helada luego de trabajar en la construcción (ámbito personal). Ahora ese concepto se amplia y moderniza. 
+
+>FCO: De todas formas podemos decir algo así! pero hay que ver si hay otros estudios que digan algo así para sostener que hubo un cambio en ese sentido. Voy a investigar, pero a mi me hace sentido. Si es que no encontramos nada, es algo que siempre podemos sugerir en la conclusión. 
+
 
 ### Pregunta/comentarios
 

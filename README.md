@@ -1,3 +1,18 @@
+
+June 9th
+
+Buena noticia Alex. Tenemos entonces bastante libertad en el formato del artículo. No es necesario que leas tanto Jasper, solo dale una mirada rápida a su Annual Review o al artículo orginal de 1998 donde empezó la discusión de emociones y protesta. En la versión v3 ya escribí una sección sobre protestas y emociones, principalmente en base a su literatura. Pero te comento 3 cosas en que te podrías enfocar en vez de Jasper. Puedes hacerlo en inglés o en español, como prefieras. Si no tienes tiempo, basta con que te enfoques en una y yo avanzo con las otras.
+
+1. El terreno se suspendió el 18O y se retomó 18 días después. Entonces, no es que estemos midiendo el impácto exacto del 18O, sino que más bien de todo lo que pasó desde ese día hasta que se retomó el terreno. Eso incluye protestas masivas, abusos a los derechos humanos, saqueos, etc. Esa es la principal crítica que nos pueden hacer, porque no hay claridad del treatment. Aun cuando en Socious parecen ser más relajados con esas cosas. Es más, luego del 18vo día, el grupo de tratados sigue siendo tratado porque las protestas no pararon. Pero es un grupo que se está viendo afectado por el movimiento a diferencia del 27,6% de la muestra encuestada antes. Para poder dar mayor claridad de nuestro "tratamiento" sería muy bueno si puedes hacer una **tabla con lo que pasó por día entre el 18O y cuando se retomó el terreno**. La mencionaremos en la sección de método y la pondríamos en el material suplementario. Me imagino una tabla con 18 filas (una por día), y tres columnas: fecha, descripción de eventos, y links de fuente (idealmente medios gringos o en su defecto británicos). Puede que la BBC tenga los hechos descritos día por día en su sección de Chile. Si tienen otra idea para darle más claridad al tratamiento, sería genial.      
+2. Ya hay algunos papers sobre el estallido social. En la versión actualizada (v3) en el github los incluyo dos. Es el de Somma y uno publicado en el International Journal of Sociology. Sería bueno si le puedes dar una **mirada a esos artículos u otros que ya se hayan publicado en inglés sobre el estallido social**. Qué podríamos decir? Un párrafo para la introducción estaría bueno. No se si digan algo relacionado con las emociones, pero también se podría poner ahí. Ojalá puedas ver cómo están llamando a las protestas... social outbreak?
+3. La más latera. Podrías ayudarme a **recodificar la variable comuna en regiones? Hacemos 751 casos cada uno**. Usaron un código no estandarizado y hay incluso algunos missing. Cuéntame si lo puedes hacer y nos organizamos. Es super importante para saber si el antes y después está balanceados geográficamente. Si es que no, debemos corregir por eso en los resultados.   
+
+Me parece muy buena idea de hacerlo 100% reproducible. Creo que es un valor agregado para el artículo y un desafío. Nunca lo he hecho 100%. El problema es que ya llevamos escritas 3500 palabras y he usado mendeley en word. Habría que cambiar todas las referencias manualmente a bibtex, pero creo que vale la pena hacerlo una vez ya tengamos un primer draft en word. Por ahora terminémoslo en word y luego lo transformamos a un Rmarkdown. Solo la preparación de variables me gustaría aun poder hacerlo en Stata.
+
+
+
+_______________________________________________________________________
+
 - `Pride and protest_SP.docx`: Archivo para aprobación inicial de contraparte. 
 
 	Es algo que podría ser la introducción del artículo. Traté de escribir algo neutro, aunque siempre es difícil. Ustedes conocen más a la contraparte que yo y siéntanse en la libertad de modificarlo. 

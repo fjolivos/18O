@@ -3,7 +3,13 @@ library(lubridate)
 library(tidyverse)
 library(rdrobust)
 
-image <- read_sav("base_final_anon.sav")
+image <- read_dta("base_analisis.dta")
+
+region <- read_dta('pride_protests.dta')
+
+image <- image %>% 
+  left_join(region %>% select(id, geozone),
+            by = 'id')
 
 #--------------Create cut-off point
 
@@ -22,15 +28,9 @@ image %>%
   slice(c(1:3, (n()-2):n()))
 
 
-#--------------Export
+# Export
 
-image[image == 99] <- NA
-image[image == 88] <- NA
-
-pride_coutry <- table(image$P1)
-pride_coutry
-
-myvars <- c("id", "comuna", "comuna2", "sexo", "edad", 
+myvars <- c("id", "comuna", "comuna2", "geozone", "sexo", "edad", 
             "P1", "P2", "P3_3", "P3_7", "P3_8", "P3_9", 
             "P7_1", "P7_2", "P8_2", "P9_2", "P10", 
             "P11_1", "P11_3", "P11_5", "P11_6", "P12_3", "P12_4", 
@@ -41,7 +41,7 @@ subimage <- image %>%
   select(all_of(myvars))
 
 write_dta(subimage, 
-          "base_analisis.dta")
+          "data/01-base_analisis.dta")
 
 saveRDS(subimage, 
-        "base_analisis.rds")
+        "data/01-base_analisis.rds")

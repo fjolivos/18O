@@ -68,6 +68,10 @@ prideLW <- pride %>%
 
 saveRDS(prideLW, 'data/03-prideLW.rds')
 
+
+
+# Chart with diferences ---------------------------------------------------
+# 
 # Create new dataframe mpg_means_se
 df_category <- prideLW %>% 
   select(id, treat, gender, age_4, geozone, edu, household) %>% 
@@ -109,3 +113,66 @@ ggsave('plots/03-df_category_diff_treat.png',
        scale = 1.25,
        width = 14, height = 8,
        units = 'cm')
+
+
+# Entropy Balancing sample ------------------------------------------------
+# 
+# Package `ebal` Entropy reweighting to create balanced samples
+library(ebal)
+
+prideLW <- prideLW %>% 
+  arrange(treat, id)
+
+# entropy balancing
+eb.out <- ebal::ebalance(Treatment = prideLW$treat, 
+                         X = transmute(prideLW, 
+                                       across(c(gender, age, geozone, edu, household), as.integer)))
+
+summary(eb.out)
+
+# Adding weight vector to database.
+prideLW <- prideLW %>% 
+  mutate(w_ebal_r = c(eb.out$w, rep(1, nrow(.) - length(eb.out$w))))
+
+prideLW %>% 
+  group_by(treat) %>% 
+  slice_head(n = 5) %>% 
+  select(id, treat, webal, w_ebal_r)
+
+prideLW %>% 
+  mutate(diff_ebal = webal - w_ebal_r, .keep = 'used') %>% 
+  arrange(diff_ebal)
+
+# Check means
+prideLW_ebal <- prideLW %>% 
+  mutate(treat, w_ebal_r, webal, 
+         across(c(gender, age, geozone, edu, household), as.integer), 
+         .keep = 'used')
+
+# means in treatment group data
+prideLW_ebal %>% 
+  filter(treat) %>% 
+  summarise(cases = n(), 
+            across(c(gender, age, geozone, edu, household), 
+                   mean))
+
+# means in reweighted control group data (R)
+prideLW_ebal %>% 
+  filter(!treat) %>% 
+  summarise(cases = n(), 
+            across(c(gender, age, geozone, edu, household), 
+                   weighted.mean, w = w_ebal_r))
+
+# means in reweighted control group data (Stata)
+prideLW_ebal %>% 
+  filter(!treat) %>% 
+  summarise(cases = n(), 
+            across(c(gender, age, geozone, edu, household), 
+                   weighted.mean, w = webal))
+
+# means in raw data control group data 
+prideLW_ebal %>% 
+  filter(!treat) %>% 
+  summarise(cases = n(), 
+            across(c(gender, age, geozone, edu, household), 
+                   mean))

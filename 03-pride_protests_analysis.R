@@ -33,7 +33,7 @@ library(tidyverse)
 pride <- readRDS("data/02-base_analisis.rds")
 
 pride %>% 
-  transmute(across(c(gender, age, geozone, edu, household, 
+  transmute(across(c(gender, age_4, geozone, edu, household, 
                      pride_CL, pride_esf, energy, pride_sym, pride_dev, pride_pl, treat),
                    as.numeric)) %>% 
   summarise(across(everything(), max))
@@ -43,22 +43,22 @@ table(pride$pride_CL, useNA = 'ifany')
 
 # Change inplicit to explicit NA
 pride <- pride %>% 
-  mutate(across(c(gender, age, geozone, edu, household, 
-                  pride_CL, pride_esf, energy, pride_sym, pride_dev, pride_pl, treat),
+  mutate(across(c(gender, age_4, geozone, edu, household, 
+                  pride_CL, pride_esf, energy, pride_sym, pride_dev, pride_pl),
                 ~replace(., . %in% c(88, 99), NA)))
 
 
 # Change variables to factor
 pride <- pride %>% 
-  mutate(across(c(gender, age, geozone, edu, household, 
-                  pride_CL, pride_esf, energy, pride_sym, pride_dev, pride_pl, treat),
+  mutate(across(c(gender, age_4, geozone, edu, household, 
+                  pride_CL, pride_esf, energy, pride_sym, pride_dev, pride_pl),
                 as_factor))
 
 table(pride$pride_CL, useNA = 'ifany')
 
 # Keep cases with full response
 pride <- pride %>% 
-  mutate(sample = rowSums(across(c(gender, age, geozone, edu, household, 
+  mutate(sample = rowSums(across(c(gender, age_4, geozone, edu, household, 
                                    pride_CL, pride_esf, energy, pride_sym, pride_dev, pride_pl, treat), 
                                  is.na)))
 count(pride, sample)
@@ -66,62 +66,48 @@ count(pride, sample)
 prideLW <- pride %>% 
   filter(sample == 0)
 
-
 # Create new dataframe mpg_means_se
+df_category <- prideLW %>% 
+  select(id, treat, gender, age_4, geozone, edu, household) %>% 
+  pivot_longer(cols = c(gender, age_4, geozone, edu, household), 
+               names_to = 'variable', 
+               values_to = 'category')
 
-genderplot<-ggplot(prideLW, aes(x=treat, y=gender)) + geom_bar(stat="summary") + 
-  ylim(0, 1) +labs(title=" ", x =" ", y = "Proportion") +
-  geom_errorbar(stat="summary")
+df_category_diff_treat <- df_category %>% 
+  group_by(variable, category) %>% 
+  summarise(mean_se(treat))
 
-zone1plot<-ggplot(prideLW, aes(x=treat, y=zone1)) + geom_bar(stat="summary") + 
-  ylim(0, 1) +labs(title=" ", x =" ", y = "Proportion") +
-  geom_errorbar(stat="summary")
 
-zone2plot<-ggplot(prideLW, aes(x=treat, y=zone2)) + geom_bar(stat="summary") + 
-  ylim(0, 1) +labs(title=" ", x =" ", y = "Proportion") +
-  geom_errorbar(stat="summary")
+df_category_diff_treat %>% 
+  ggplot(aes(x = category, y = y)) +
+  geom_linerange(aes(ymin = 0, ymax = y, 
+                     colour = stage(variable,
+                                    after_scale = prismatic::clr_alpha(colour, alpha = .3))), 
+                 size = 2) + 
+  geom_errorbar(aes(ymin = ymin, ymax = ymax,
+                    colour = stage(variable,
+                                   after_scale = prismatic::clr_darken(colour, shift = .5))), 
+                size = 1) +
+  geom_point(size = 2) +
+  facet_grid(cols = vars(variable),
+             scales = 'free_x', space = 'free_x') +
+  scale_y_continuous('Proportion of treated', 
+                     limits = c(0,1),
+                     labels = scales::percent) +
+  scale_colour_brewer(palette = 'Set1', guide = 'none') + 
+  coord_cartesian(expand = FALSE) + 
+  labs(title = "Sample balance", 
+       subtitle = 'Difference between treated and non-treated in five categories',
+       x = " ") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 90, size = rel(1), 
+                                   hjust = 1, vjust = 0.5))
+  
+ggsave('plots/03-df_category_diff_treat.png',
+       scale = 1.25,
+       width = 14, height = 8,
+       units = 'cm')
 
-zone3plot<-ggplot(prideLW, aes(x=treat, y=zone3)) + geom_bar(stat="summary") + 
-  ylim(0, 1) +labs(title=" ", x =" ", y = "Proportion") +
-  geom_errorbar(stat="summary")
-
-zone4plot<-ggplot(prideLW, aes(x=treat, y=zone4)) + geom_bar(stat="summary") + 
-  ylim(0, 1) +labs(title=" ", x =" ", y = "Proportion") +
-  geom_errorbar(stat="summary")
-
-edu1plot<-ggplot(prideLW, aes(x=treat, y=edu1)) + geom_bar(stat="summary") + 
-  ylim(0, 1) +labs(title=" ", x =" ", y = "Proportion") +
-  geom_errorbar(stat="summary")
-
-edu2plot<-ggplot(prideLW, aes(x=treat, y=edu2)) + geom_bar(stat="summary") + 
-  ylim(0, 1) +labs(title=" ", x =" ", y = "Proportion") +
-  geom_errorbar(stat="summary")
-
-edu3plot<-ggplot(prideLW, aes(x=treat, y=edu3)) + geom_bar(stat="summary") + 
-  ylim(0, 1) +labs(title=" ", x =" ", y = "Proportion") +
-  geom_errorbar(stat="summary")
-
-household1plot<-ggplot(prideLW, aes(x=treat, y=household1)) + geom_bar(stat="summary") + 
-  ylim(0, 1) +labs(title=" ", x =" ", y = "Proportion") +
-  geom_errorbar(stat="summary")
-
-household2plot<-ggplot(prideLW, aes(x=treat, y=household2)) + geom_bar(stat="summary") + 
-  ylim(0, 1) +labs(title=" ", x =" ", y = "Proportion") +
-  geom_errorbar(stat="summary")
-
-household3plot<-ggplot(prideLW, aes(x=treat, y=household3)) + geom_bar(stat="summary") + 
-  ylim(0, 1) +labs(title=" ", x =" ", y = "Proportion") +
-  geom_errorbar(stat="summary")
-
-household4plot<-ggplot(prideLW, aes(x=treat, y=household4)) + geom_bar(stat="summary") + 
-  ylim(0, 1) +labs(title=" ", x =" ", y = "Proportion") +
-  geom_errorbar(stat="summary")
-
-ggarrange(genderplot, zone1plot, zone2plot, zone3plot, zone4plot,
-          edu1plot, edu2plot, edu3plot, household1plot, household2plot, household3plot, household4plot  +  rremove("x.text"), 
-          labels = c("Female", "North", "Center", "Mat. Region", "South", "Low edu.", "Middle edu.", "High edu.", "One", "Two", "Three", "Four+"),
-          font.label = list(size = 10),
-          ncol = 3, nrow = 4)
 
 #:::::::::::::::::::::::::REGRESIONS
 

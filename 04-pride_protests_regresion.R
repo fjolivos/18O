@@ -7,8 +7,8 @@
 
 #:::::::::::::::::::::::::REGRESIONS
 
-library(tidyverse)
 library(arm)
+library(tidyverse)
 
 prideLW <- readRDS("data/03-prideLW.rds")
 
@@ -20,11 +20,17 @@ prideLW <- readRDS("data/03-prideLW.rds")
 
 
 # Collection of dependen variables
-df_LHS <- tibble(formula_LHS = c('pride_CL', 'pride_dev', 'pride_sym', 'pride_pl', 
-                                 'energy', 'pride_esf'))
+df_LHS <- tibble(type_var = as_factor(c(rep('National', 4), rep('Chileans', 2))),
+                 formula_LHS = c('Country Pride'         = 'pride_CL', 
+                                 'Economic Developement' = 'pride_dev', 
+                                 'Symbols'               = 'pride_sym', 
+                                 'Place'                 = 'pride_pl', 
+                                 'Energy'                = 'energy', 
+                                 'Efford'                = 'pride_esf'))
 
 # Different models to be test
-df_RHS <- tibble(formula_RHS = c('treat', 
+df_RHS <- tibble(type_model = as_factor(c('Binary', 'Covariates', 'Entropy')),
+                 formula_RHS = c('treat', 
                                  'treat + gender + age + geozone + edu + household',
                                  'treat'),
                  wt = list(NULL, NULL, 'webal'))
@@ -41,7 +47,7 @@ f_lm <- function(.df, formula, weights = NULL){
   if(!is.null(weights)){
     weights <- rlang::sym(weights)  
   }
-
+  
   rlang::eval_tidy(
     rlang::quo(
       lm(formula = formula, 
@@ -55,87 +61,44 @@ f_lm <- function(.df, formula, weights = NULL){
 df_models <- df_models %>% 
   mutate(model = map2(formula, wt, ~f_lm(.df = prideLW, formula = .x, weights = .y)))
 
+# Coeficients of interest
+df_models_estimate <- df_models %>% 
+  rowwise() %>% 
+  summarise(across(c(type_var, formula_LHS, type_model)),
+            broom::tidy(model),
+            as_tibble(confint(model)))
 
-broom::tidy(df_models$model[[1]])
+# Edit data frame for ploting
+df_models_treat <- df_models_estimate %>% 
+  filter(term == 'treatTRUE') %>% 
+  rename(est_low = `2.5 %`, est_high = `97.5 %`) %>% 
+  mutate(name = names(formula_LHS), .before = everything())
 
-  output$glance
 
-output %>% unnest(glance)
+# Plot
 
+df_models_treat %>% 
+  ggplot(aes(x = type_model, 
+             y = estimate, ymin = est_low, ymax = est_high,
+             colour = type_var)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0) +
+  facet_wrap(facets = vars(type_var, name)) +
+  coord_flip() +
+  scale_colour_brewer(palette = 'Set1', guide = 'none') + 
+  scale_y_continuous(labels = function(x) scales::number(x, accuracy = .1)) + 
+  theme_minimal() +
+  labs(title = 'Effects of the social outburst',
+       subtitle = 'Estimates of OLS regression regarding National pride and Chileans',
+       x = 'Models',
+       y = 'Effects of the social crisis') +
+  theme(plot.title.position = 'plot',
+        axis.text.x = element_text(size = rel(.75)))
 
-#Pride toward the country
-table(prideLW$pride_CL)
-
-m1A <- lm(formula = as.integer(pride_CL) ~ treat, 
-          data = prideLW)
-m1B <- lm(formula = as.integer(pride_CL) ~ treat + gender + age + geozone + edu + household, 
-          data = prideLW)
-m1C <- lm(formula = as.integer(pride_CL) ~ treat, weights = prideLW$webal,
-          data = prideLW)
-
-par(mfrow = c(1, 1))
-coefplot(m1A, xlim=c(-.6, 0), main = "Country Pride", intercept=FALSE)
-coefplot(m1B, add=TRUE, col.pts="red",  intercept=FALSE)
-coefplot(m1C, add=TRUE, col.pts="blue", intercept=FALSE, offset=0.2)
-
-#Pride economic development
-m2A <- lm(formula = as.integer(pride_dev) ~ treat, data = prideLW)
-m2B <- lm(formula = as.integer(pride_dev) ~ treat + gender + age + geozone + edu + household, 
-          data = prideLW)
-m2C <- lm(formula = as.integer(pride_dev) ~ treat, data = prideLW, weights = prideLW$webal)
-
-par(mfrow = c(1, 1))
-coefplot(m2A, xlim=c(-.6, 0), main = "Economic Development", intercept=FALSE)
-coefplot(m2B, add=TRUE, col.pts="red",  intercept=FALSE)
-coefplot(m2C, add=TRUE, col.pts="blue", intercept=FALSE, offset=0.2)
-
-#Pride symbols
-m3A <- lm(formula = as.integer(pride_sym) ~ treat, data = prideLW)
-m3B <- lm(formula = as.integer(pride_sym) ~ treat + gender + age + geozone + edu + household, 
-          data = prideLW)
-m3C <- lm(formula = as.integer(pride_sym) ~ treat, data = prideLW, weights = prideLW$webal)
-
-par(mfrow = c(1, 1))
-coefplot(m3A, xlim=c(-.6, 0), main = "Symbols", intercept=FALSE)
-coefplot(m3B, add=TRUE, col.pts="red",  intercept=FALSE)
-coefplot(m3C, add=TRUE, col.pts="blue", intercept=FALSE, offset=0.2)
-
-#Place to live
-m4A <- lm(formula = as.integer(pride_pl) ~ treat, data = prideLW)
-m4B <- lm(formula = as.integer(pride_pl) ~ treat + gender + age + geozone + edu + household, 
-          data = prideLW)
-m4C <- lm(formula = as.integer(pride_pl) ~ treat, data = prideLW, weights = prideLW$webal)
-
-par(mfrow = c(1, 1))
-coefplot(m4A, xlim=c(-.6, 0), main = "Place", intercept=FALSE)
-coefplot(m4B, add=TRUE, col.pts="red",  intercept=FALSE)
-coefplot(m4C, add=TRUE, col.pts="blue", intercept=FALSE, offset=0.2)
-
-#::::::Effects on moral sentiments toward Chileans
-
-#Energy 
-
-m5A <- lm(formula = as.integer(energy) ~ treat, data = prideLW)
-m5B <- lm(formula = as.integer(energy) ~ treat + gender + age + geozone + edu + household, 
-          data = prideLW)
-m5C <- lm(formula = as.integer(energy) ~ treat, data = prideLW, weights = prideLW$webal)
-
-par(mfrow = c(1, 1))
-coefplot(m5A, xlim=c(0, .5), main = "Energy", intercept=FALSE)
-coefplot(m5B, add=TRUE, col.pts="red",  intercept=FALSE)
-coefplot(m5C, add=TRUE, col.pts="blue", intercept=FALSE, offset=0.2)
-
-#Effort
-
-m6A <- lm(formula = as.integer(pride_esf) ~ treat, data = prideLW)
-m6B <- lm(formula = as.integer(pride_esf) ~ treat + gender + age + geozone + edu + household, 
-          data = prideLW)
-m6C <- lm(formula = as.integer(pride_esf) ~ treat, data = prideLW, weights = prideLW$webal)
-
-par(mfrow = c(1, 1))
-coefplot(m6A, xlim=c(0, .5), main = "Effort", intercept=FALSE)
-coefplot(m6B, add=TRUE, col.pts="red",  intercept=FALSE)
-coefplot(m6C, add=TRUE, col.pts="blue", intercept=FALSE, offset=0.2)
+ggsave('plots/04-df_models_treat.png',
+       scale = 1.25,
+       width = 14, height = 8,
+       units = 'cm')
 
 
 

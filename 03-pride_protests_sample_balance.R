@@ -149,9 +149,10 @@ prideLW_ebal <- prideLW %>%
          across(c(gender, age, geozone, edu, household), as.integer), 
          .keep = 'used')
 
-# means in treatment group data
+
+# means in raw data: control and treatement group
 prideLW_ebal %>% 
-  filter(treat) %>% 
+  group_by(treat) %>% 
   summarise(cases = n(), 
             across(c(gender, age, geozone, edu, household), 
                    mean))
@@ -169,10 +170,3 @@ prideLW_ebal %>%
   summarise(cases = n(), 
             across(c(gender, age, geozone, edu, household), 
                    weighted.mean, w = webal))
-
-# means in raw data control group data 
-prideLW_ebal %>% 
-  filter(!treat) %>% 
-  summarise(cases = n(), 
-            across(c(gender, age, geozone, edu, household), 
-                   mean))

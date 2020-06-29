@@ -2,3 +2,11 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# Latex intermediate files
+.tex
+.log
+
+# Outputs
+.pdf
+.html
